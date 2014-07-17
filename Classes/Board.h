@@ -10,6 +10,8 @@
 
 USING_NS_CC;
 
+using namespace std;
+
 template <class T>
 inline void hash_combine(std::size_t & seed, const T & v) {
     std::hash<T> hasher;
@@ -31,18 +33,25 @@ namespace std {
 class Board {
 private:
     static std::vector<std::string> sFileNames;
-    Map<std::pair<int, int>, AbsSprite *> mBoardMap;
+    vector<vector<Sprite *> > mBoardMap;
     TMXTiledMap *mTiledMap;
     TMXLayer *mBackgroundLayer;
     TMXLayer *mMetaLayer;
     TMXLayer *mObjectLayer;
-    void initObject();
+    Layer* mBoardLayer;
 
+    void initTiledMap(const string &filename);
+    void initObject();
+    Vec2 tileCoordForPosition(Vec2 position);
+    Vec2 offsetForPosition(Vec2 position);
+    bool canPut(Vec2 &coord);
 public:
-    Board();
+    Board(Layer *layer);
     void loadTiledMap(const std::string &filename);
     void update(std::pair<int, int> &point);
     AbsSprite *next(AbsSprite *sprite);
+    TMXTiledMap *getTiledMap();
+    void onTouch(Touch *touch);
 };
 
 #endif

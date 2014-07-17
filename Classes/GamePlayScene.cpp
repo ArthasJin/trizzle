@@ -1,5 +1,7 @@
 #include "GamePlayScene.h"
 
+GamePlayScene::GamePlayScene() : mBoard(Board(this)) {}
+
 Scene* GamePlayScene::createScene() {
     // 'scene' is an autorelease object
     auto scene = Scene::create();
@@ -19,7 +21,7 @@ bool GamePlayScene::init() {
         return false;
     }
     initBackground();
-    initTiledMap();
+    initGameBoard();
     initNavigator();
     initTouchListener();
     return true;
@@ -33,14 +35,9 @@ void GamePlayScene::initBackground() {
     addChild(background);
 }
 
-void GamePlayScene::initTiledMap() {
-    // Board board("test.tmx");
-    mTiledMap = TMXTiledMap::create("test.tmx");
-    mTiledMap->setAnchorPoint(Vec2(0.5, 0.5));
-    Size visibleSize = Director::sharedDirector()->getVisibleSize();
-    Vec2 origin = Director::sharedDirector()->getVisibleOrigin();
-    mTiledMap->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
-
+void GamePlayScene::initGameBoard() {
+    mBoard.loadTiledMap("test.tmx");
+    mTiledMap = mBoard.getTiledMap();
     // mTiledMap->setScale(2.0);
 
     addChild(mTiledMap);
@@ -95,60 +92,12 @@ void GamePlayScene::initTouchListener() {
 }
 
 bool GamePlayScene::onTouchBegan(Touch *touch, Event *unused_event) {
-    log("onTouchBegan");
     return true;
-}
-
-void GamePlayScene::onTouchMoved(Touch *touch, Event *unused_event) {
-
 }
 
 void GamePlayScene::onTouchEnded(Touch *touch, Event *unused_event) {
     log("onTouchEnded");
-    Vec2 point = touch->getLocationInView();
-    point = Director::sharedDirector()->convertToGL(point);
-    point = convertToNodeSpace(point);
-    Sprite *s = Sprite::create("wizard.png");
-    mPlayer = s;
-    point = this->tileCoordForPosition(point);
-    log("x = %f, y = %f", point.x, point.y);
-    s->setAnchorPoint(Vec2::ZERO);
-    s->setPosition(point);
-    addChild(s);
-//    Vec2 point = touch->getLocationInView();
-//    point = Director::sharedDirector()->convertToGL(point);
-//    point = convertToNodeSpace(point);
-//    Vec2 playerPos = mPlayer->getPosition();
-//    Vec2 diff;
-//    Vec2::subtract(point, playerPos, &diff);
-
-//    if ( abs(diff.x) > abs(diff.y) ) {
-//        if (diff.x > 0) {
-//            playerPos.x += mTiledMap->getTileSize().width;
-//        } else {
-//            playerPos.x -= mTiledMap->getTileSize().width;
-//        }
-//    } else {
-//        if (diff.y > 0) {
-//            playerPos.y += mTiledMap->getTileSize().height;
-//        } else {
-//            playerPos.y -= mTiledMap->getTileSize().height;
-//        }
-//    }
-//    // safety check on the bounds of the map
-//    if (playerPos.x <= (mTiledMap->getMapSize().width * mTiledMap->getTileSize().width) &&
-//        playerPos.y <= (mTiledMap->getMapSize().height * mTiledMap->getTileSize().height) &&
-//        playerPos.y >= 0 &&
-//        playerPos.x >= 0)
-//    {
-//        setPlayerPosition(playerPos);
-//    }
-}
-
-Vec2 GamePlayScene::tileCoordForPosition(Vec2 position) {
-    int x = (int) (position.x / mTiledMap->getTileSize().width) * mTiledMap->getTileSize().width;
-    int y = (int) (position.y / mTiledMap->getTileSize().height) * mTiledMap->getTileSize().height;
-    return Vec2(x, y);
+    mBoard.onTouch(touch);
 }
 
 void GamePlayScene::setPlayerPosition(Vec2 &postion) {

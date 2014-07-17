@@ -14,7 +14,6 @@ private:
     void initBackground();
     void initTitle();
 public:
-    // Here's a difference. Method 'init' in cocos2d-x returns bool, instead of returning 'id' in cocos2d-iphone
     virtual bool init();
     static Scene* createScene();
     CREATE_FUNC(SplashScene);

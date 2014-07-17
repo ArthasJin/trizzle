@@ -11,23 +11,23 @@ USING_NS_CC;
 class GamePlayScene : public Layer {
 private:
     Sprite *mPlayer;
+    Board mBoard;
 
     TMXTiledMap *mTiledMap;
     void initBackground();
-    void initTiledMap();
+    void initGameBoard();
     void initNavigator();
     void initTouchListener();
     void navigatorCallback(Ref* sender);
     void start();
     void back();
-    Vec2 tileCoordForPosition(Vec2 position);
     void setPlayerPosition(Vec2 &postion);
     virtual bool onTouchBegan(Touch *touch, Event *unused_event);
-    virtual void onTouchMoved(Touch *touch, Event *unused_event);
     virtual void onTouchEnded(Touch *touch, Event *unused_event);
     void onUpdate(float dt);
 public:
     static Scene* createScene();
+    GamePlayScene();
     virtual bool init();
     CREATE_FUNC(GamePlayScene);
 };

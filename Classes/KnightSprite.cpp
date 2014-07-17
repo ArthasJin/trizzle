@@ -7,4 +7,3 @@ KnightSprite::KnightSprite() {
 bool KnightSprite::init() {
     return Sprite::init();
 }
-
