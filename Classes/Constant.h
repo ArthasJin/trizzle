@@ -7,7 +7,6 @@ public:
     static const char* FONT;
     static const double FRAME_RATE;
 
-    static const int TYPE_INVALID;
     static const int TYPE_THIEF;
     static const int TYPE_WIZARD;
     static const int TYPE_KNIGHT;

@@ -21,10 +21,8 @@ private:
     void navigatorCallback(Ref* sender);
     void start();
     void back();
-    void setPlayerPosition(Vec2 &postion);
     virtual bool onTouchBegan(Touch *touch, Event *unused_event);
     virtual void onTouchEnded(Touch *touch, Event *unused_event);
-    void onUpdate(float dt);
 public:
     static Scene* createScene();
     GamePlayScene();

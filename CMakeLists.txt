@@ -44,13 +44,10 @@ set(GAME_SRC
   Classes/AppDelegate.cpp
   Classes/Constant.cpp
   Classes/GamePlayScene.cpp
-  Classes/KnightSprite.cpp
   Classes/MenuScene.cpp
   Classes/SplashScene.cpp
-  Classes/ThiefSprite.cpp
-  Classes/WizardSprite.cpp
   Classes/Board.cpp
-  Classes/AbsSprite.cpp
+  Classes/TrizzleSprite.cpp
 )
 
 set(COCOS2D_ROOT ${CMAKE_SOURCE_DIR}/cocos2d)

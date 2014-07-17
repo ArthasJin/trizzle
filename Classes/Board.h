@@ -3,17 +3,15 @@
 
 #include "cocos2d.h"
 #include "Constant.h"
-#include "AbsSprite.h"
-#include "KnightSprite.h"
-#include "ThiefSprite.h"
-#include "WizardSprite.h"
+#include "TrizzleSprite.h"
+
+#include <time.h>
 
 USING_NS_CC;
-
 using namespace std;
 
 template <class T>
-inline void hash_combine(std::size_t & seed, const T & v) {
+inline void hash_combine(size_t & seed, const T & v) {
     std::hash<T> hasher;
     seed ^= hasher(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
 }
@@ -30,28 +28,47 @@ namespace std {
     };
 }
 
-class Board {
+class Board : public Ref {
 private:
-    static std::vector<std::string> sFileNames;
-    vector<vector<Sprite *> > mBoardMap;
+    static vector<string> sFiles;
+    static vector<string> sEnemyFiles;
+    vector<vector<TrizzleSprite *> > mBoardMap;
     TMXTiledMap *mTiledMap;
     TMXLayer *mBackgroundLayer;
     TMXLayer *mMetaLayer;
     TMXLayer *mObjectLayer;
     Layer* mBoardLayer;
 
+    bool mIsRunning;
+    bool mIsPlayerTurn;
+
+    queue<TrizzleSprite *> mPlayerQueue;
+    queue<TrizzleSprite *> mEnemyQueue;
+
     void initTiledMap(const string &filename);
     void initObject();
     Vec2 tileCoordForPosition(Vec2 position);
     Vec2 offsetForPosition(Vec2 position);
     bool canPut(Vec2 &coord);
+    TrizzleSprite *getSprite(Vec2 &coord);
+    void setSprite(Vec2 &coord, TrizzleSprite *sprite);
+    void update(float dt);
+    void moveRight(TrizzleSprite *sprite);
+    void moveLeft(TrizzleSprite *sprite);
+    bool canMove(Vec2 &coord);
+    void attack(TrizzleSprite *attacker, TrizzleSprite *defender);
+    bool canAttack(TrizzleSprite *sprite);
+    bool isFinished();
+    void doPlayerAction();
+    void doEnemyAction();
 public:
     Board(Layer *layer);
-    void loadTiledMap(const std::string &filename);
-    void update(std::pair<int, int> &point);
-    AbsSprite *next(AbsSprite *sprite);
+    void loadTiledMap(const string &filename);
+    TrizzleSprite *getNext(TrizzleSprite *sprite);
     TMXTiledMap *getTiledMap();
     void onTouch(Touch *touch);
+    void startPlay();
+    void stopPlay();
 };
 
 #endif

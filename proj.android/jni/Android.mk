@@ -7,15 +7,12 @@ LOCAL_MODULE := cocos2dcpp_shared
 LOCAL_MODULE_FILENAME := libcocos2dcpp
 
 LOCAL_SRC_FILES := hellocpp/main.cpp \
-	               ../../Classes/WizardSprite.cpp \
 				   ../../Classes/MenuScene.cpp \
 				   ../../Classes/SplashScene.cpp \
-				   ../../Classes/KnightSprite.cpp \
 				   ../../Classes/AppDelegate.cpp \
-				   ../../Classes/ThiefSprite.cpp \
 				   ../../Classes/GamePlayScene.cpp \
 				   ../../Classes/Constant.cpp \
-				   ../../Classes/AbsSprite.cpp \
+				   ../../Classes/TrizzleSprite.cpp \
 				   ../../Classes/Board.cpp
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../Classes

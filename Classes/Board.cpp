@@ -1,18 +1,32 @@
 #include "Board.h"
 
-Board::Board(Layer *layer) : mBoardLayer(layer) {}
+Board::Board(Layer *layer) : mBoardLayer(layer),
+                             mPlayerQueue(queue<TrizzleSprite *>()),
+                             mEnemyQueue(queue<TrizzleSprite *>()),
+                             mIsRunning(false),
+                             mIsPlayerTurn(true) {}
 
-std::vector<std::string> makeVector() {
-    std::vector<std::string> v;
-    v.push_back("knight.png");
+vector<string> makeVector() {
+    vector<string> v;
     v.push_back("thief.png");
     v.push_back("wizard.png");
+    v.push_back("knight.png");
     return v;
 }
 
-std::vector<std::string> Board::sFileNames = makeVector();
+vector<string> makeEnemy() {
+    vector<string> v;
+    v.push_back("thief_enemy.png");
+    v.push_back("wizard_enemy.png");
+    v.push_back("knight_enemy.png");
+    return v;
+}
 
-void Board::loadTiledMap(const std::string &filename) {
+vector<string> Board::sFiles = makeVector();
+
+vector<string> Board::sEnemyFiles = makeEnemy();
+
+void Board::loadTiledMap(const string &filename) {
     initTiledMap(filename);
     initObject();
 }
@@ -27,28 +41,31 @@ void Board::initTiledMap(const string &filename) {
     mMetaLayer = mTiledMap->getLayer(Constant::TILED_META_LAYER);
     mObjectLayer = mTiledMap->getLayer(Constant::TILED_OBJECT_LAYER);
 
-    Size metaSize = mMetaLayer->getContentSize();
-    mBoardMap = vector<vector<Sprite *> >(metaSize.height, vector<Sprite *>(metaSize.width, NULL));
+    Size metaSize = mMetaLayer->getLayerSize();
+    mBoardMap = vector<vector<TrizzleSprite *> >(metaSize.height, vector<TrizzleSprite *>(metaSize.width, NULL));
 }
 
 void Board::initObject() {
     TMXObjectGroup *group = mTiledMap->getObjectGroup("object");
-    ValueMap spawnPoint = group->getObject("SpawnPoint");
-    int x = spawnPoint["x"].asInt();
-    int y = spawnPoint["y"].asInt();
-    int role = spawnPoint["role"].asInt();
-    if (role == Constant::TYPE_THIEF) {
+    ValueVector points = group->getObjects();
+    for (ValueVector::iterator iter = points.begin(); iter != points.end(); ++iter) {
+        Value v = *iter;
+        ValueMap spawnPoint = v.asValueMap();
+        int x = spawnPoint["x"].asInt();
+        int y = spawnPoint["y"].asInt();
+        int role = spawnPoint["role"].asInt();
         log("x = %d y = %d role = %d", x, y, role);
-        Sprite *s = Sprite::create("thief_enemy.png");
+
+        TrizzleSprite *s = TrizzleSprite::create(sEnemyFiles[role], role, true);
+        Vec2 offsetPos = offsetForPosition(Vec2(x, y));
+        Vec2 coord = tileCoordForPosition(offsetPos);
+
+        setSprite(coord, s);
         s->setAnchorPoint(Vec2::ZERO);
-        s->setPosition(this->offsetForPosition(Vec2(x, y)));
+        s->setPosition(offsetPos);
+
         this->mBoardLayer->addChild(s, 999);
-    } else if (role == Constant::TYPE_WIZARD) {
-
-    } else if (role == Constant::TYPE_KNIGHT) {
-
     }
-
 }
 
 TMXTiledMap* Board::getTiledMap() {
@@ -59,44 +76,146 @@ void Board::onTouch(Touch *touch) {
     Vec2 point = touch->getLocationInView();
     point = Director::sharedDirector()->convertToGL(point);
     point = mBoardLayer->convertToNodeSpace(point);
-    Sprite *s = Sprite::create("wizard.png");
-
     Vec2 coord = this->tileCoordForPosition(point);
     if (canPut(coord)) {
-        log("can put");
+        TrizzleSprite *sprite = getNext(getSprite(coord));
+
+        setSprite(coord, sprite);
         point = this->offsetForPosition(point);
-        s->setAnchorPoint(Vec2::ZERO);
-        s->setPosition(point);
-        mBoardLayer->addChild(s);
+        sprite->setAnchorPoint(Vec2::ZERO);
+        sprite->setPosition(point);
+        mBoardLayer->addChild(sprite);
     }
 }
 
-void Board::update(std::pair<int, int> &point) {
-
+TrizzleSprite *Board::getSprite(Vec2 &coord) {
+    return mBoardMap[coord.y][coord.x];
 }
 
-AbsSprite* Board::next(AbsSprite *sprite) {
-    AbsSprite *newSprite = NULL;
-    std::string fileName = sFileNames[(sprite->getType() + 1) % sFileNames.size()];
-    // log("fileName = %s", fileName);
-//    if (sprite->getType() == Constant::TYPE_KNIGHT) {
-//        newSprite = ThiefSprite::create(fileName);
-//    } else if (sprite->getType() == Constant::TYPE_THIEF) {
-//        newSprite = WizardSprite::create(fileName);
-//    } else if (sprite->getType() == Constant::TYPE_WIZARD) {
-//        newSprite = KnightSprite::create(fileName);
-//    }
+void Board::setSprite(Vec2 &coord, TrizzleSprite *sprite) {
+    mBoardMap[coord.y][coord.x] = sprite;
+}
+
+TrizzleSprite *Board::getNext(TrizzleSprite *sprite) {
+    TrizzleSprite *newSprite = NULL;
+    if (sprite == NULL) {
+        newSprite = TrizzleSprite::create(sFiles[0], 0, false);
+    } else {
+        int nextType = (sprite->getType() + 1) % sFiles.size();
+        string filename = sFiles[nextType];
+        mBoardLayer->removeChild(sprite);
+        newSprite = TrizzleSprite::create(filename, nextType, false);
+    }
     return newSprite;
 }
 
 bool Board::canPut(Vec2 &coord) {
     int tileGid = mMetaLayer->getTileGIDAt(coord);
     Value properties = mTiledMap->getPropertiesForGID(tileGid);
-    log("type = %d", properties.getType());
     if (properties.getType() == Value::Type::MAP) {
         return properties.asValueMap()["put"].asBool();
     }
     return false;
+}
+
+void Board::startPlay() {
+    int row = mBoardMap.size();
+    int col = mBoardMap[0].size();
+    for (int i = 0; i < row; ++i) {
+        for (int j = 0; j < col; ++j) {
+            if (mBoardMap[i][j]) {
+                TrizzleSprite *sprite = mBoardMap[i][j];
+                if (sprite->isEmeny()) {
+                    log("enemy row = %d, col = %d", i, j);
+                    mEnemyQueue.push(sprite);
+                }
+            }
+        }
+        for (int j = col - 1; j >= 0; --j) {
+            if (mBoardMap[i][j]) {
+                TrizzleSprite *sprite = mBoardMap[i][j];
+                if (!sprite->isEmeny()) {
+                    log("player row = %d, col = %d", i, j);
+                    mPlayerQueue.push(sprite);
+                }
+            }
+        }
+    }
+    mIsRunning = true;
+    Director::sharedDirector()->getScheduler()->schedule(schedule_selector(Board::update), this, 1.0, false);
+}
+
+void Board::update(float dt) {
+    log("Board::update");
+    if (!isFinished() && mIsRunning) {
+        if (mIsPlayerTurn) {
+            doPlayerAction();
+        } else {
+            doEnemyAction();
+        }
+        mIsPlayerTurn = !mIsPlayerTurn;
+    }
+}
+
+void Board::doPlayerAction() {
+    if (!mPlayerQueue.empty()) {
+        log("playerAction");
+        TrizzleSprite *sprite = mPlayerQueue.front();
+        mPlayerQueue.pop();
+        moveRight(sprite);
+        mPlayerQueue.push(sprite);
+    }
+}
+
+void Board::doEnemyAction() {
+    if (!mEnemyQueue.empty()) {
+        log("enemyAction");
+        TrizzleSprite *sprite = mEnemyQueue.front();
+        mEnemyQueue.pop();
+        moveLeft(sprite);
+        mEnemyQueue.push(sprite);
+    }
+}
+
+void Board::moveRight(TrizzleSprite *sprite) {
+    Vec2 coord = tileCoordForPosition(sprite->getPosition());
+    coord.x -= 1;
+    if (canMove(coord)) {
+        Vec2 pos = sprite->getPosition();
+        pos.x += 32;
+        sprite->setPosition(pos);
+    }
+}
+
+void Board::moveLeft(TrizzleSprite *sprite) {
+    Vec2 coord = tileCoordForPosition(sprite->getPosition());
+    coord.x += 1;
+    if (canMove(coord)) {
+        Vec2 pos = sprite->getPosition();
+        pos.x -= 32;
+        sprite->setPosition(pos);
+    }
+}
+
+bool Board::canMove(Vec2 &coord) {
+    return true;
+}
+
+bool Board::canAttack(TrizzleSprite *sprite) {
+    return false;
+}
+
+void Board::attack(TrizzleSprite *attacker, TrizzleSprite *defender) {
+
+}
+
+bool Board::isFinished() {
+    return false;
+}
+
+void Board::stopPlay() {
+    mIsRunning = false;
+    Director::sharedDirector()->getScheduler()->unschedule(schedule_selector(Board::update), this);
 }
 
 Vec2 Board::offsetForPosition(Vec2 position) {

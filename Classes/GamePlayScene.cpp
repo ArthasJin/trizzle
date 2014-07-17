@@ -71,12 +71,11 @@ void GamePlayScene::navigatorCallback(Ref* sender) {
 }
 
 void GamePlayScene::start() {
-    log("start");
-    schedule(schedule_selector(GamePlayScene::onUpdate), 1.0);
+    mBoard.startPlay();
 }
 
 void GamePlayScene::back() {
-    log("back");
+    mBoard.stopPlay();
     Scene *menuScene = MenuScene::createScene();
     auto transition = TransitionFade::create(1.0f, menuScene);
     Director::sharedDirector()->replaceScene(transition);
@@ -96,28 +95,5 @@ bool GamePlayScene::onTouchBegan(Touch *touch, Event *unused_event) {
 }
 
 void GamePlayScene::onTouchEnded(Touch *touch, Event *unused_event) {
-    log("onTouchEnded");
     mBoard.onTouch(touch);
-}
-
-void GamePlayScene::setPlayerPosition(Vec2 &postion) {
-//    Vec2 tileCoord = this->tileCoordForPosition(postion);
-//    TMXLayer *meta = mTiledMap->getLayer("Meta");
-//    int tileGid = meta->getTileGIDAt(tileCoord);
-//    log("tileGid = %d", tileGid);
-//    if (tileGid) {
-//        Value value = mTiledMap->getPropertiesForGID(tileGid);
-//        ValueMap dict = value.asValueMap();
-//        if (dict["Collidable"].asBool()) {
-//            log("true");
-//            return;
-//        }
-//    }
-    mPlayer->setPosition(postion);
-}
-
-void GamePlayScene::onUpdate(float dt) {
-    Vec2 pos = mPlayer->getPosition();
-    pos.x += 32;
-    mPlayer->setPosition(pos);
 }
