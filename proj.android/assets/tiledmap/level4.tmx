@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="10" height="2" tilewidth="32" tileheight="32">
+ <tileset firstgid="1" name="dg_grounds32" tilewidth="32" tileheight="32">
+  <image source="dg_grounds32.png" width="288" height="608"/>
+ </tileset>
+ <layer name="ground layer" width="10" height="2">
+  <data>
+   <tile gid="33"/>
+   <tile gid="33"/>
+   <tile gid="33"/>
+   <tile gid="33"/>
+   <tile gid="33"/>
+   <tile gid="33"/>
+   <tile gid="33"/>
+   <tile gid="33"/>
+   <tile gid="33"/>
+   <tile gid="33"/>
+   <tile gid="33"/>
+   <tile gid="33"/>
+   <tile gid="33"/>
+   <tile gid="33"/>
+   <tile gid="33"/>
+   <tile gid="33"/>
+   <tile gid="33"/>
+   <tile gid="33"/>
+   <tile gid="33"/>
+   <tile gid="33"/>
+  </data>
+ </layer>
+</map>

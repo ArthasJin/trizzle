@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="7" height="2" tilewidth="32" tileheight="32">
+ <tileset firstgid="1" name="dg_grounds32" tilewidth="32" tileheight="32">
+  <image source="dg_grounds32.png" width="288" height="608"/>
+ </tileset>
+ <tileset firstgid="172" name="dg_edging232" tilewidth="32" tileheight="32">
+  <image source="dg_edging232.png" width="256" height="544"/>
+ </tileset>
+ <tileset firstgid="308" name="dg_edging132" tilewidth="32" tileheight="32">
+  <image source="dg_edging132.png" width="256" height="512"/>
+ </tileset>
+ <layer name="ground layer" width="7" height="2">
+  <data>
+   <tile gid="312"/>
+   <tile gid="313"/>
+   <tile gid="3221225809"/>
+   <tile gid="313"/>
+   <tile gid="3221225809"/>
+   <tile gid="3221225809"/>
+   <tile gid="315"/>
+   <tile gid="336"/>
+   <tile gid="337"/>
+   <tile gid="337"/>
+   <tile gid="337"/>
+   <tile gid="337"/>
+   <tile gid="337"/>
+   <tile gid="339"/>
+  </data>
+ </layer>
+</map>

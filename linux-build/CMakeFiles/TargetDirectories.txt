@@ -1,0 +1,14 @@
+/home/xiaolei/work/trizzle/MyCppGame/linux-build/cocos2d/cocos/audio/CMakeFiles/audio.dir
+/home/xiaolei/work/trizzle/MyCppGame/linux-build/cocos2d/external/Box2D/CMakeFiles/box2d.dir
+/home/xiaolei/work/trizzle/MyCppGame/linux-build/cocos2d/external/chipmunk/src/CMakeFiles/chipmunk_static.dir
+/home/xiaolei/work/trizzle/MyCppGame/linux-build/cocos2d/cocos/CMakeFiles/cocos2d.dir
+/home/xiaolei/work/trizzle/MyCppGame/linux-build/cocos2d/cocos/editor-support/cocosbuilder/CMakeFiles/cocosbuilder.dir
+/home/xiaolei/work/trizzle/MyCppGame/linux-build/cocos2d/cocos/editor-support/cocostudio/CMakeFiles/cocostudio.dir
+/home/xiaolei/work/trizzle/MyCppGame/linux-build/cocos2d/extensions/CMakeFiles/extensions.dir
+/home/xiaolei/work/trizzle/MyCppGame/linux-build/cocos2d/cocos/editor-support/spine/CMakeFiles/spine.dir
+/home/xiaolei/work/trizzle/MyCppGame/linux-build/cocos2d/external/tinyxml2/CMakeFiles/tinyxml2.dir
+/home/xiaolei/work/trizzle/MyCppGame/linux-build/CMakeFiles/trizzle.dir
+/home/xiaolei/work/trizzle/MyCppGame/linux-build/CMakeFiles/trizzle_CORE_PRE_BUILD.dir
+/home/xiaolei/work/trizzle/MyCppGame/linux-build/CMakeFiles/trizzle_PRE_BUILD.dir
+/home/xiaolei/work/trizzle/MyCppGame/linux-build/cocos2d/external/unzip/CMakeFiles/unzip.dir
+/home/xiaolei/work/trizzle/MyCppGame/linux-build/cocos2d/external/xxhash/CMakeFiles/xxhash.dir
