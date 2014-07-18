@@ -88,7 +88,7 @@ void Board::onTouch(Touch *touch) {
     }
 }
 
-TrizzleSprite *Board::getSprite(Vec2 &coord) {
+TrizzleSprite *Board::getSprite(Vec2 coord) {
     return mBoardMap[coord.y][coord.x];
 }
 
@@ -119,30 +119,33 @@ bool Board::canPut(Vec2 &coord) {
 }
 
 void Board::startPlay() {
-    int row = mBoardMap.size();
-    int col = mBoardMap[0].size();
-    for (int i = 0; i < row; ++i) {
-        for (int j = 0; j < col; ++j) {
-            if (mBoardMap[i][j]) {
-                TrizzleSprite *sprite = mBoardMap[i][j];
-                if (sprite->isEmeny()) {
-                    log("enemy row = %d, col = %d", i, j);
-                    mEnemyQueue.push(sprite);
+    if (!mIsRunning) {
+        int row = mBoardMap.size();
+        int col = mBoardMap[0].size();
+        for (int i = 0; i < row; ++i) {
+            for (int j = 0; j < col; ++j) {
+                if (mBoardMap[i][j]) {
+                    TrizzleSprite *sprite = mBoardMap[i][j];
+                    if (sprite->isEmeny()) {
+                        log("enemy row = %d, col = %d", i, j);
+                        mEnemyQueue.push(sprite);
+                    }
+                }
+            }
+            for (int j = col - 1; j >= 0; --j) {
+                if (mBoardMap[i][j]) {
+                    TrizzleSprite *sprite = mBoardMap[i][j];
+                    if (!sprite->isEmeny()) {
+                        log("player row = %d, col = %d", i, j);
+                        mPlayerQueue.push(sprite);
+                    }
                 }
             }
         }
-        for (int j = col - 1; j >= 0; --j) {
-            if (mBoardMap[i][j]) {
-                TrizzleSprite *sprite = mBoardMap[i][j];
-                if (!sprite->isEmeny()) {
-                    log("player row = %d, col = %d", i, j);
-                    mPlayerQueue.push(sprite);
-                }
-            }
-        }
+        mIsRunning = true;
+        Director::sharedDirector()->getScheduler()->schedule(schedule_selector(Board::update), this, 0.5, false);
+//        update(0);
     }
-    mIsRunning = true;
-    Director::sharedDirector()->getScheduler()->schedule(schedule_selector(Board::update), this, 1.0, false);
 }
 
 void Board::update(float dt) {
@@ -155,6 +158,16 @@ void Board::update(float dt) {
         }
         mIsPlayerTurn = !mIsPlayerTurn;
     }
+    if (!mPlayerQueue.empty() && mEnemyQueue.empty()) {
+        log("player wins!");
+        showMessage("You Win!");
+        stopPlay();
+    }
+    if (mPlayerQueue.empty() && !mEnemyQueue.empty()) {
+        log("CPU wins!");
+        showMessage("You Lose!");
+        stopPlay();
+    }
 }
 
 void Board::doPlayerAction() {
@@ -162,8 +175,15 @@ void Board::doPlayerAction() {
         log("playerAction");
         TrizzleSprite *sprite = mPlayerQueue.front();
         mPlayerQueue.pop();
-        moveRight(sprite);
-        mPlayerQueue.push(sprite);
+        if (sprite->isAlive()) {
+            TrizzleSprite *defend = NULL;
+            if (canAttack(sprite, &defend)) {
+                attack(sprite, defend);
+            } else {
+                moveRight(sprite);
+            }
+            mPlayerQueue.push(sprite);
+        }
     }
 }
 
@@ -172,45 +192,158 @@ void Board::doEnemyAction() {
         log("enemyAction");
         TrizzleSprite *sprite = mEnemyQueue.front();
         mEnemyQueue.pop();
-        moveLeft(sprite);
-        mEnemyQueue.push(sprite);
+        if (sprite->isAlive()) {
+            TrizzleSprite *defend = NULL;
+            if (canAttack(sprite, &defend)) {
+                attack(sprite, defend);
+            } else {
+                moveLeft(sprite);
+            }
+            mEnemyQueue.push(sprite);
+        }
     }
+}
+
+void Board::explode(TrizzleSprite *sprite) {
+    Vector<SpriteFrame*> animFrames(40);
+    string str = "explosion.png";
+    for(int i = 0; i < 40; i++) {
+        auto frame = SpriteFrame::create(str, Rect(0 + i * 64, 0, 64, 64));
+        animFrames.pushBack(frame);
+    }
+    auto animation = Animation::createWithSpriteFrames(animFrames, 0.02f);
+    Animate *animate = Animate::create(animation);
+    sprite->runAction(animate);
+}
+
+void Board::defend(TrizzleSprite *sprite) {
+    Vector<SpriteFrame*> animFrames(40);
+    string str = "shield.png";
+    for(int i = 0; i < 40; i++) {
+        auto frame = SpriteFrame::create(str, Rect(0, 0, 64, 64));
+        animFrames.pushBack(frame);
+    }
+    auto animation = Animation::createWithSpriteFrames(animFrames, 0.02f);
+    auto animate = Animate::create(animation);
+    sprite->runAction(animate);
 }
 
 void Board::moveRight(TrizzleSprite *sprite) {
     Vec2 coord = tileCoordForPosition(sprite->getPosition());
-    coord.x -= 1;
+    log("moveRight coord x = %f y = %f", coord.x, coord.y);
+    coord.y -= 1;
+    coord.x += 1;
     if (canMove(coord)) {
         Vec2 pos = sprite->getPosition();
         pos.x += 32;
         sprite->setPosition(pos);
+        Vec2 prevCoord = Vec2(coord.x - 1, coord.y);
+        setSprite(prevCoord, NULL);
+        setSprite(coord, sprite);
     }
 }
 
 void Board::moveLeft(TrizzleSprite *sprite) {
     Vec2 coord = tileCoordForPosition(sprite->getPosition());
-    coord.x += 1;
+    coord.x -= 1;
+    coord.y -= 1;
     if (canMove(coord)) {
         Vec2 pos = sprite->getPosition();
         pos.x -= 32;
         sprite->setPosition(pos);
+        Vec2 prevCoord = Vec2(coord.x + 1, coord.y);
+        setSprite(prevCoord, NULL);
+        setSprite(coord, sprite);
     }
 }
 
 bool Board::canMove(Vec2 &coord) {
-    return true;
+    log("canMove coord x = %f y = %f", coord.x, coord.y);
+    int tileGid = mMetaLayer->getTileGIDAt(coord);
+    Value properties = mTiledMap->getPropertiesForGID(tileGid);
+    if (properties.getType() == Value::Type::MAP) {
+        log("can move = %d", properties.asValueMap()["move"].asBool());
+        return properties.asValueMap()["move"].asBool();
+    }
+    return false;
 }
 
-bool Board::canAttack(TrizzleSprite *sprite) {
+bool Board::canAttack(TrizzleSprite *sprite, TrizzleSprite **defender) {
+    int row = mBoardMap.size();
+    int col = mBoardMap[0].size();
+    Vec2 pos = sprite->getPosition();
+    Vec2 coord = tileCoordForPosition(pos);
+    coord.y -= 1;
+    log("canAttack coord x = %f y = %f", coord.x, coord.y);
+    if (coord.y > 0) {
+        TrizzleSprite *sp = getSprite(Vec2(coord.x, coord.y - 1));
+        if (sp != NULL && sp->isAlive() && sp->isEmeny() != sprite->isEmeny()) {
+            log("can attack up");
+            *defender = sp;
+            return true;
+        }
+    }
+    if (coord.x < col) {
+        TrizzleSprite *sp = getSprite(Vec2(coord.x + 1, coord.y));
+        if (sp != NULL && sp->isAlive() && sp->isEmeny() != sprite->isEmeny()) {
+            log("can attack right");
+            *defender = sp;
+            return true;
+        }
+    }
+    if (coord.y < row - 1) {
+        TrizzleSprite *sp = getSprite(Vec2(coord.x, coord.y + 1));
+        if (sp != NULL && sp->isAlive() && sp->isEmeny() != sprite->isEmeny()) {
+            log("can attack down");
+            *defender = sp;
+            return true;
+        }
+    }
+    if (coord.x > 0) {
+        TrizzleSprite *sp = getSprite(Vec2(coord.x - 1, coord.y));
+        if (sp != NULL && sp->isAlive() && sp->isEmeny() != sprite->isEmeny()) {
+            log("can attack left");
+            *defender = sp;
+            return true;
+        }
+    }
     return false;
 }
 
 void Board::attack(TrizzleSprite *attacker, TrizzleSprite *defender) {
-
+    log("Board::attack");
+    if (attacker->getType() == 0 && defender->getType() == 1 ||
+            attacker->getType() == 1 && defender->getType() == 2 ||
+            attacker->getType() == 2 && defender->getType() == 0) {
+        explode(defender);
+        defender->setAlive(false);
+        Vec2 coord = tileCoordForPosition(defender->getPosition());
+        coord.y -= 1;
+        setSprite(coord, NULL);
+    }
 }
 
 bool Board::isFinished() {
+    if (mPlayerQueue.empty() || mEnemyQueue.empty()) {
+        return true;
+    }
+    int row = mBoardMap.size();
+    int col = mBoardMap[0].size();
+    for (int i = 0; i < row; ++i) {
+        for (int j = 0; j < col; ++j) {
+
+        }
+    }
     return false;
+}
+
+void Board::showMessage(const string msg) {
+    Size visibleSize = Director::sharedDirector()->getVisibleSize();
+    Vec2 origin = Director::sharedDirector()->getVisibleOrigin();
+    LabelTTF *label = LabelTTF::create(msg, Constant::FONT, 120, CCSizeMake(320, 240), kCCTextAlignmentCenter);
+    label->setAnchorPoint(Vec2(0.5, 0.5));
+    label->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
+    mBoardLayer->addChild(label);
 }
 
 void Board::stopPlay() {
@@ -225,7 +358,7 @@ Vec2 Board::offsetForPosition(Vec2 position) {
 }
 
 Vec2 Board::tileCoordForPosition(Vec2 position) {
-    int x = position.x / mTiledMap->getTileSize().width;
-    int y = ((mTiledMap->getMapSize().height * mTiledMap->getTileSize().height) - position.y) / mTiledMap->getTileSize().height;
+    int x = (position.x) / mTiledMap->getTileSize().width;
+    int y = ((mTiledMap->getMapSize().height * mTiledMap->getTileSize().height) - (position.y)) / mTiledMap->getTileSize().height;
     return Vec2(x, y);
 }

@@ -50,17 +50,20 @@ private:
     Vec2 tileCoordForPosition(Vec2 position);
     Vec2 offsetForPosition(Vec2 position);
     bool canPut(Vec2 &coord);
-    TrizzleSprite *getSprite(Vec2 &coord);
+    TrizzleSprite *getSprite(Vec2 coord);
     void setSprite(Vec2 &coord, TrizzleSprite *sprite);
     void update(float dt);
     void moveRight(TrizzleSprite *sprite);
     void moveLeft(TrizzleSprite *sprite);
     bool canMove(Vec2 &coord);
     void attack(TrizzleSprite *attacker, TrizzleSprite *defender);
-    bool canAttack(TrizzleSprite *sprite);
+    bool canAttack(TrizzleSprite *sprite, TrizzleSprite **defender);
     bool isFinished();
     void doPlayerAction();
     void doEnemyAction();
+    void explode(TrizzleSprite *sprite);
+    void defend(TrizzleSprite *sprite);
+    void showMessage(const string msg);
 public:
     Board(Layer *layer);
     void loadTiledMap(const string &filename);
