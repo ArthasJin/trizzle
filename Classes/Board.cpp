@@ -34,8 +34,8 @@ void Board::loadTiledMap(const string &filename) {
 void Board::initTiledMap(const string &filename) {
     mTiledMap = TMXTiledMap::create(filename);
     mTiledMap->setAnchorPoint(Vec2(0.5, 0.5));
-    Size visibleSize = Director::sharedDirector()->getVisibleSize();
-    Vec2 origin = Director::sharedDirector()->getVisibleOrigin();
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
     mTiledMap->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
     mBackgroundLayer = mTiledMap->getLayer(Constant::TILED_BACKGROUND_LAYER);
     mMetaLayer = mTiledMap->getLayer(Constant::TILED_META_LAYER);
@@ -74,7 +74,7 @@ TMXTiledMap* Board::getTiledMap() {
 
 void Board::onTouch(Touch *touch) {
     Vec2 point = touch->getLocationInView();
-    point = Director::sharedDirector()->convertToGL(point);
+    point = Director::getInstance()->convertToGL(point);
     point = mBoardLayer->convertToNodeSpace(point);
     Vec2 coord = this->tileCoordForPosition(point);
     if (canPut(coord)) {
@@ -143,7 +143,7 @@ void Board::startPlay() {
             }
         }
         mIsRunning = true;
-        Director::sharedDirector()->getScheduler()->schedule(schedule_selector(Board::update), this, 0.5, false);
+        Director::getInstance()->getScheduler()->schedule(schedule_selector(Board::update), this, 0.5, false);
 //        update(0);
     }
 }
@@ -338,9 +338,9 @@ bool Board::isFinished() {
 }
 
 void Board::showMessage(const string msg) {
-    Size visibleSize = Director::sharedDirector()->getVisibleSize();
-    Vec2 origin = Director::sharedDirector()->getVisibleOrigin();
-    LabelTTF *label = LabelTTF::create(msg, Constant::FONT, 120, CCSizeMake(320, 240), kCCTextAlignmentCenter);
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+    LabelTTF *label = LabelTTF::create(msg, Constant::FONT, 120, CCSizeMake(360, 280), kCCTextAlignmentCenter);
     label->setAnchorPoint(Vec2(0.5, 0.5));
     label->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
     mBoardLayer->addChild(label);

@@ -28,8 +28,8 @@ bool GamePlayScene::init() {
 }
 
 void GamePlayScene::initBackground() {
-    Size visibleSize = Director::sharedDirector()->getVisibleSize();
-    Vec2 origin = Director::sharedDirector()->getVisibleOrigin();
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
     Sprite *background = Sprite::create("background.png");
     background->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
     addChild(background);
@@ -50,8 +50,8 @@ void GamePlayScene::initNavigator() {
     start->setTag(Constant::MENU_START_TAG);
 
     Menu *menu = Menu::create(back, start, NULL);
-    Size visibleSize = Director::sharedDirector()->getVisibleSize();
-    Vec2 origin = Director::sharedDirector()->getVisibleOrigin();
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
     back->setPosition(Vec2(origin.x + visibleSize.width - back->getContentSize().width / 2,
                                     origin.y + back->getContentSize().height / 2));
     start->setPosition(Vec2(origin.x + start->getContentSize().width / 2,
@@ -78,7 +78,7 @@ void GamePlayScene::back() {
     mBoard.stopPlay();
     Scene *menuScene = MenuScene::createScene();
     auto transition = TransitionFade::create(1.0f, menuScene);
-    Director::sharedDirector()->replaceScene(transition);
+    Director::getInstance()->replaceScene(transition);
 }
 
 void GamePlayScene::initTouchListener() {

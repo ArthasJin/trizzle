@@ -24,8 +24,8 @@ bool MenuScene::init() {
 }
 
 void MenuScene::initBackground() {
-    Size visibleSize = Director::sharedDirector()->getVisibleSize();
-    Vec2 origin = Director::sharedDirector()->getVisibleOrigin();
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
     Sprite *background = Sprite::create("background.png");
     background->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
     addChild(background);
@@ -53,11 +53,11 @@ void MenuScene::initMenuItem() {
     exit->setFontSize(100);
     exit->setFontName(Constant::FONT);
 
-    Menu *menu = Menu::create(play, settings, exit, NULL);
+    Menu *menu = Menu::create(play, NULL);
     menu->alignItemsVerticallyWithPadding(20.0);
 
-    Size visibleSize = Director::sharedDirector()->getVisibleSize();
-    Vec2 origin = Director::sharedDirector()->getVisibleOrigin();
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
     menu->setAnchorPoint(Vec2(0.5, 0.5));
     menu->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
     addChild(menu);
@@ -80,7 +80,7 @@ void MenuScene::play() {
     log("play");
     Scene *gamePlayScene = GamePlayScene::createScene();
     auto transition = TransitionFade::create(1.0f, gamePlayScene);
-    Director::sharedDirector()->replaceScene(transition);
+    Director::getInstance()->replaceScene(transition);
 }
 
 void MenuScene::settings() {
@@ -93,10 +93,5 @@ void MenuScene::exit() {
     MessageBox("You pressed the close button. Windows Store Apps do not implement a close button.","Alert");
     return;
 #endif
-
     Director::getInstance()->end();
-
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-    exit(0);
-#endif
 }
