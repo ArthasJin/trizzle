@@ -36,7 +36,7 @@ void GamePlayScene::initBackground() {
 }
 
 void GamePlayScene::initGameBoard() {
-    mBoard.loadTiledMap("test.tmx");
+    mBoard.loadTiledMap("level.tmx");
     mTiledMap = mBoard.getTiledMap();
     // mTiledMap->setScale(2.0);
 

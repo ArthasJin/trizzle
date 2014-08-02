@@ -235,7 +235,7 @@ void Board::moveRight(TrizzleSprite *sprite) {
     coord.x += 1;
     if (canMove(coord)) {
         Vec2 pos = sprite->getPosition();
-        pos.x += 32;
+        pos.x += 64;
         sprite->setPosition(pos);
         Vec2 prevCoord = Vec2(coord.x - 1, coord.y);
         setSprite(prevCoord, NULL);
@@ -249,7 +249,7 @@ void Board::moveLeft(TrizzleSprite *sprite) {
     coord.y -= 1;
     if (canMove(coord)) {
         Vec2 pos = sprite->getPosition();
-        pos.x -= 32;
+        pos.x -= 64;
         sprite->setPosition(pos);
         Vec2 prevCoord = Vec2(coord.x + 1, coord.y);
         setSprite(prevCoord, NULL);
