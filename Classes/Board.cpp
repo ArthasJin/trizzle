@@ -22,9 +22,42 @@ vector<string> makeEnemy() {
     return v;
 }
 
+Vector<SpriteFrame *> createFrames(const string &filename, int n) {
+    Vector<SpriteFrame*> animFrames(n);
+    for(int i = 0; i < n; i++) {
+        auto frame = SpriteFrame::create(filename, Rect(0 + i * 64, 0, 64, 64));
+        animFrames.pushBack(frame);
+    }
+    return animFrames;
+}
+
+unordered_map<string, Vector<SpriteFrame *> > makeFrameDict() {
+    unordered_map<string, Vector<SpriteFrame *> > dict;
+    Vector<SpriteFrame *> explodeFrames = createFrames("explosion.png", 40);
+    Vector<SpriteFrame *> wizardLeftFrames = createFrames("wizard_walk_left.png", 9);
+    Vector<SpriteFrame *> wizardRightFrames = createFrames("wizard_walk_right.png", 9);
+
+    Vector<SpriteFrame *> knightLeftFrames = createFrames("knight_walk_left.png", 8);
+    Vector<SpriteFrame *> knightRightFrames = createFrames("knight_walk_right.png", 8);
+
+    Vector<SpriteFrame *> thiefLeftFrames = createFrames("thief_walk_left.png", 9);
+    Vector<SpriteFrame *> thiefRightFrames = createFrames("thief_walk_right.png", 9);
+
+    dict["explosion"] = explodeFrames;
+    dict["wizard_walk_left"] = wizardLeftFrames;
+    dict["wizard_walk_right"] = wizardRightFrames;
+    dict["knight_walk_left"] = knightLeftFrames;
+    dict["knight_walk_right"] = knightRightFrames;
+    dict["thief_walk_left"] = thiefLeftFrames;
+    dict["thief_walk_right"] = thiefRightFrames;
+    return dict;
+}
+
 vector<string> Board::sFiles = makeVector();
 
 vector<string> Board::sEnemyFiles = makeEnemy();
+
+unordered_map<string, Vector<SpriteFrame *> > Board::sFrameDict = makeFrameDict();
 
 void Board::loadTiledMap(const string &filename) {
     initTiledMap(filename);
@@ -206,13 +239,7 @@ void Board::doEnemyAction() {
 }
 
 void Board::explode(TrizzleSprite *sprite) {
-    Vector<SpriteFrame*> animFrames(40);
-    string str = "explosion.png";
-    for(int i = 0; i < 40; i++) {
-        auto frame = SpriteFrame::create(str, Rect(0 + i * 64, 0, 64, 64));
-        animFrames.pushBack(frame);
-    }
-    auto animation = Animation::createWithSpriteFrames(animFrames, 0.02f);
+    auto animation = Animation::createWithSpriteFrames(Board::sFrameDict["explosion"], 0.02f);
     Animate *animate = Animate::create(animation);
     sprite->runAction(animate);
 }

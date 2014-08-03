@@ -32,6 +32,7 @@ class Board : public Ref {
 private:
     static vector<string> sFiles;
     static vector<string> sEnemyFiles;
+    static unordered_map<string, Vector<SpriteFrame *> > sFrameDict;
     vector<vector<TrizzleSprite *> > mBoardMap;
     TMXTiledMap *mTiledMap;
     TMXLayer *mBackgroundLayer;
