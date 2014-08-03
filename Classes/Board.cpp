@@ -73,18 +73,19 @@ TMXTiledMap* Board::getTiledMap() {
 }
 
 void Board::onTouch(Touch *touch) {
-    Vec2 point = touch->getLocationInView();
-    point = Director::getInstance()->convertToGL(point);
-    point = mBoardLayer->convertToNodeSpace(point);
-    Vec2 coord = this->tileCoordForPosition(point);
-    if (canPut(coord)) {
-        TrizzleSprite *sprite = getNext(getSprite(coord));
-
-        setSprite(coord, sprite);
-        point = this->offsetForPosition(point);
-        sprite->setAnchorPoint(Vec2::ZERO);
-        sprite->setPosition(point);
-        mBoardLayer->addChild(sprite);
+    if (!mIsRunning) {
+        Vec2 point = touch->getLocationInView();
+        point = Director::getInstance()->convertToGL(point);
+        point = mBoardLayer->convertToNodeSpace(point);
+        Vec2 coord = this->tileCoordForPosition(point);
+        if (canPut(coord)) {
+            TrizzleSprite *sprite = getNext(getSprite(coord));
+            setSprite(coord, sprite);
+            point = this->offsetForPosition(point);
+            sprite->setAnchorPoint(Vec2::ZERO);
+            sprite->setPosition(point);
+            mBoardLayer->addChild(sprite);
+        }
     }
 }
 
