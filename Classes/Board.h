@@ -65,6 +65,7 @@ private:
     void explode(TrizzleSprite *sprite);
     void defend(TrizzleSprite *sprite);
     void showMessage(const string msg);
+    Vector<SpriteFrame *> getSpriteFrames(TrizzleSprite *sprite, int direction);
 public:
     Board(Layer *layer);
     void loadTiledMap(const string &filename);

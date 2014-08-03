@@ -261,10 +261,18 @@ void Board::moveRight(TrizzleSprite *sprite) {
     log("moveRight coord x = %f y = %f", coord.x, coord.y);
     coord.y -= 1;
     coord.x += 1;
+
     if (canMove(coord)) {
-        Vec2 pos = sprite->getPosition();
-        pos.x += 64;
-        sprite->setPosition(pos);
+        auto animation = Animation::createWithSpriteFrames(getSpriteFrames(sprite, Constant::DIRECT_RIGHT), 0.1f);
+        auto animate = Animate::create(animation);
+        Vec2 delta(64, 0);
+        MoveBy *moveBy = MoveBy::create(0.5f, delta);
+
+        sprite->runAction(moveBy);
+        sprite->runAction(animate);
+//        Vec2 pos = sprite->getPosition();
+//        pos.x += 64;
+//        sprite->setPosition(pos);
         Vec2 prevCoord = Vec2(coord.x - 1, coord.y);
         setSprite(prevCoord, NULL);
         setSprite(coord, sprite);
@@ -276,9 +284,16 @@ void Board::moveLeft(TrizzleSprite *sprite) {
     coord.x -= 1;
     coord.y -= 1;
     if (canMove(coord)) {
-        Vec2 pos = sprite->getPosition();
-        pos.x -= 64;
-        sprite->setPosition(pos);
+        auto animation = Animation::createWithSpriteFrames(getSpriteFrames(sprite, Constant::DIRECT_LEFT), 0.1f);
+        auto animate = Animate::create(animation);
+        Vec2 delta(-64, 0);
+        MoveBy *moveBy = MoveBy::create(0.5f, delta);
+
+        sprite->runAction(moveBy);
+        sprite->runAction(animate);
+//        Vec2 pos = sprite->getPosition();
+//        pos.x -= 64;
+//        sprite->setPosition(pos);
         Vec2 prevCoord = Vec2(coord.x + 1, coord.y);
         setSprite(prevCoord, NULL);
         setSprite(coord, sprite);
@@ -389,4 +404,29 @@ Vec2 Board::tileCoordForPosition(Vec2 position) {
     int x = (position.x) / mTiledMap->getTileSize().width;
     int y = ((mTiledMap->getMapSize().height * mTiledMap->getTileSize().height) - (position.y)) / mTiledMap->getTileSize().height;
     return Vec2(x, y);
+}
+
+Vector<SpriteFrame *> Board::getSpriteFrames(TrizzleSprite *sprite, int direction) {
+    if (sprite) {
+        if (sprite->getType() == Constant::TYPE_KNIGHT) {
+            if (direction == Constant::DIRECT_LEFT) {
+                return sFrameDict[Constant::KNIGHT_LEFT];
+            } else if (direction == Constant::DIRECT_RIGHT) {
+                return sFrameDict[Constant::KNIGHT_RIGHT];
+            }
+        } else if (sprite->getType() == Constant::TYPE_THIEF) {
+            if (direction == Constant::DIRECT_LEFT) {
+                return sFrameDict[Constant::THIEF_LEFT];
+            } else if (direction == Constant::DIRECT_RIGHT) {
+                return sFrameDict[Constant::THIEF_RIGHT];
+            }
+        } else if (sprite->getType() == Constant::TYPE_WIZARD) {
+            if (direction == Constant::DIRECT_LEFT) {
+                return sFrameDict[Constant::WIZARD_LEFT];
+            } else if (direction == Constant::DIRECT_RIGHT) {
+                return sFrameDict[Constant::WIZARD_RIGHT];
+            }
+        }
+    }
+    return Vector<SpriteFrame *>();
 }
