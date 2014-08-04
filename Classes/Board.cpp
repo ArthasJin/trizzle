@@ -65,6 +65,15 @@ void Board::loadTiledMap(const string &filename) {
 }
 
 void Board::initTiledMap(const string &filename) {
+    mBoardLayer->removeAllChildren();
+
+    mBoardMap.clear();
+    mIsRunning = false;
+    mIsPlayerTurn = true;
+    mPlayerQueue = queue<TrizzleSprite *>();
+    mEnemyQueue = queue<TrizzleSprite *>();
+
+    mLevel = filename;
     mTiledMap = TMXTiledMap::create(filename);
     mTiledMap->setAnchorPoint(Vec2(0.5, 0.5));
     Size visibleSize = Director::getInstance()->getVisibleSize();
@@ -76,6 +85,7 @@ void Board::initTiledMap(const string &filename) {
 
     Size metaSize = mMetaLayer->getLayerSize();
     mBoardMap = vector<vector<TrizzleSprite *> >(metaSize.height, vector<TrizzleSprite *>(metaSize.width, NULL));
+    mBoardLayer->addChild(mTiledMap);
 }
 
 void Board::initObject() {
@@ -194,13 +204,19 @@ void Board::update(float dt) {
     }
     if (!mPlayerQueue.empty() && mEnemyQueue.empty()) {
         log("player wins!");
-        showMessage("You Win!");
         stopPlay();
+        if (mLevel[5] == '5') {
+            showMessage("Finished!");
+        } else {
+            showMessage("You Win!");
+            showMenu(true);
+        }
     }
     if (mPlayerQueue.empty() && !mEnemyQueue.empty()) {
         log("CPU wins!");
-        showMessage("You Lose!");
         stopPlay();
+        showMessage("You Lose!");
+        showMenu(false);
     }
 }
 
@@ -385,8 +401,48 @@ void Board::showMessage(const string msg) {
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
     LabelTTF *label = LabelTTF::create(msg, Constant::FONT, 120, CCSizeMake(360, 280), kCCTextAlignmentCenter);
     label->setAnchorPoint(Vec2(0.5, 0.5));
-    label->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
-    mBoardLayer->addChild(label);
+    label->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y + 50));
+    mBoardLayer->addChild(label, 999);
+}
+
+void Board::showMenu(bool shouldNext) {
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+    Menu *menu = NULL;
+    if (!shouldNext) {
+        MenuItemFont *retry = MenuItemFont::create(Constant::MENU_RETRY, CC_CALLBACK_1(Board::menuCallback, this));
+        retry->setFontName(Constant::FONT);
+        retry->setFontSize(80);
+        retry->setTag(Constant::MENU_RETRY_TAG);
+
+        menu = Menu::create(retry, NULL);
+    } else {
+        MenuItemFont *menuTitle = MenuItemFont::create(Constant::MENU_PLAY, CC_CALLBACK_1(Board::menuCallback, this));
+        menuTitle->setFontName(Constant::FONT);
+        menuTitle->setFontSize(80);
+        menuTitle->setVisible(false);
+
+        MenuItemFont *retry = MenuItemFont::create(Constant::MENU_RETRY, CC_CALLBACK_1(Board::menuCallback, this));
+        retry->setFontName(Constant::FONT);
+        retry->setFontSize(80);
+        retry->setTag(Constant::MENU_RETRY_TAG);
+
+        MenuItemFont *next = MenuItemFont::create(Constant::MENU_NEXT, CC_CALLBACK_1(Board::menuCallback, this));
+        next->setTag(Constant::MENU_NEXT_TAG);
+        next->setFontSize(80);
+        next->setFontName(Constant::FONT);
+
+        menu = Menu::create(menuTitle, retry, next, NULL);
+    }
+    menu->setAnchorPoint(Vec2(0.5, 0.5));
+    menu->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y - 100));
+    menu->alignItemsVerticallyWithPadding(20.0);
+    mBoardLayer->addChild(menu, 999);
+}
+
+void Board::menuCallback(Ref *sender) {
+    MenuItem *item = (MenuItem *) sender;
+    mMenuClickedListener->onMenuClicked(item->getTag());
 }
 
 void Board::stopPlay() {
@@ -429,4 +485,8 @@ Vector<SpriteFrame *> Board::getSpriteFrames(TrizzleSprite *sprite, int directio
         }
     }
     return Vector<SpriteFrame *>();
+}
+
+void Board::setOnMenuClickedListener(OnMenuClickedListener *listener) {
+    mMenuClickedListener = listener;
 }

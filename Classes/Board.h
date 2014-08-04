@@ -28,6 +28,11 @@ namespace std {
     };
 }
 
+class OnMenuClickedListener {
+public:
+    virtual void onMenuClicked(int menu) = 0;
+};
+
 class Board : public Ref {
 private:
     static vector<string> sFiles;
@@ -39,9 +44,11 @@ private:
     TMXLayer *mMetaLayer;
     TMXLayer *mObjectLayer;
     Layer* mBoardLayer;
+    string mLevel;
 
     bool mIsRunning;
     bool mIsPlayerTurn;
+    OnMenuClickedListener *mMenuClickedListener;
 
     queue<TrizzleSprite *> mPlayerQueue;
     queue<TrizzleSprite *> mEnemyQueue;
@@ -66,6 +73,8 @@ private:
     void defend(TrizzleSprite *sprite);
     void showMessage(const string msg);
     Vector<SpriteFrame *> getSpriteFrames(TrizzleSprite *sprite, int direction);
+    void showMenu(bool shouldNext);
+    void menuCallback(Ref *sender);
 public:
     Board(Layer *layer);
     void loadTiledMap(const string &filename);
@@ -74,6 +83,7 @@ public:
     void onTouch(Touch *touch);
     void startPlay();
     void stopPlay();
+    void setOnMenuClickedListener(OnMenuClickedListener *listener);
 };
 
 #endif

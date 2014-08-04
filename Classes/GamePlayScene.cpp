@@ -1,5 +1,7 @@
 #include "GamePlayScene.h"
 
+string gCurrentLevel = "level1.tmx";
+
 GamePlayScene::GamePlayScene() : mBoard(Board(this)) {}
 
 Scene* GamePlayScene::createScene() {
@@ -36,17 +38,21 @@ void GamePlayScene::initBackground() {
 }
 
 void GamePlayScene::initGameBoard() {
-    mBoard.loadTiledMap("level.tmx");
-    mTiledMap = mBoard.getTiledMap();
-    // mTiledMap->setScale(2.0);
-
-    addChild(mTiledMap);
+    mBoard.loadTiledMap(gCurrentLevel);
+    // mTiledMap = mBoard.getTiledMap();
+    mBoard.setOnMenuClickedListener(this);
+    // addChild(mTiledMap);
 }
 
 void GamePlayScene::initNavigator() {
-    MenuItemImage *back = MenuItemImage::create("back.png", "back.png", CC_CALLBACK_1(GamePlayScene::navigatorCallback, this));
+    MenuItemFont *back = MenuItemFont::create(Constant::MENU_BACK, CC_CALLBACK_1(GamePlayScene::navigatorCallback, this));
+    back->setFontName(Constant::FONT);
+    back->setFontSize(100);
     back->setTag(Constant::MENU_BACK_TAG);
-    MenuItemImage *start = MenuItemImage::create("play.png", "play.png", CC_CALLBACK_1(GamePlayScene::navigatorCallback, this));
+
+    MenuItemFont *start = MenuItemFont::create(Constant::MENU_START, CC_CALLBACK_1(GamePlayScene::navigatorCallback, this));
+    start->setFontName(Constant::FONT);
+    start->setFontSize(100);
     start->setTag(Constant::MENU_START_TAG);
 
     Menu *menu = Menu::create(back, start, NULL);
@@ -96,4 +102,23 @@ bool GamePlayScene::onTouchBegan(Touch *touch, Event *unused_event) {
 
 void GamePlayScene::onTouchEnded(Touch *touch, Event *unused_event) {
     mBoard.onTouch(touch);
+}
+
+void GamePlayScene::onMenuClicked(int menu) {
+    log("onMenuClicked");
+    if (menu == Constant::MENU_RETRY_TAG) {
+        initGameBoard();
+        initNavigator();
+    } else if (menu == Constant::MENU_NEXT_TAG) {
+        gCurrentLevel = getNextLevel(gCurrentLevel);
+        initGameBoard();
+        initNavigator();
+    }
+}
+
+string GamePlayScene::getNextLevel(string level) {
+    if (level[5] < '5') {
+        level[5] += 1;
+    }
+    return level;
 }

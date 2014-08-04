@@ -12,12 +12,21 @@ const char* const Constant::MENU_PLAY = "Play";
 const char* const Constant::MENU_SETTINGS = "Settings";
 const char* const Constant::MENU_EXIT = "Exit";
 
+const char* const Constant::MENU_RETRY = "Retry";
+const char* const Constant::MENU_NEXT = "Next";
+
+const char* const Constant::MENU_START = "Start";
+const char* const Constant::MENU_BACK = "Back";
+
 const int Constant::MENU_PLAY_TAG = 0;
 const int Constant::MENU_SETTINGS_TAG = 1;
 const int Constant::MENU_EXIT_TAG = 2;
 
 const int Constant::MENU_BACK_TAG = 3;
 const int Constant::MENU_START_TAG = 4;
+
+const int Constant::MENU_RETRY_TAG = 5;
+const int Constant::MENU_NEXT_TAG = 6;
 
 const char* const Constant::TILED_BACKGROUND_LAYER = "background";
 const char* const Constant::TILED_OBJECT_LAYER = "object";

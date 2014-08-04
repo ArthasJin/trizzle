@@ -8,7 +8,9 @@
 
 USING_NS_CC;
 
-class GamePlayScene : public Layer {
+extern string gCurrentLevel;
+
+class GamePlayScene : public Layer, OnMenuClickedListener {
 private:
     Sprite *mPlayer;
     Board mBoard;
@@ -21,8 +23,10 @@ private:
     void navigatorCallback(Ref* sender);
     void start();
     void back();
+    string getNextLevel(string level);
     virtual bool onTouchBegan(Touch *touch, Event *unused_event);
     virtual void onTouchEnded(Touch *touch, Event *unused_event);
+    virtual void onMenuClicked(int menu);
 public:
     static Scene* createScene();
     GamePlayScene();

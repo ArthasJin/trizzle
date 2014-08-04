@@ -15,12 +15,21 @@ public:
     static const char* const MENU_SETTINGS;
     static const char* const MENU_EXIT;
 
+    static const char* const MENU_START;
+    static const char* const MENU_BACK;
+
+    static const char* const MENU_RETRY;
+    static const char* const MENU_NEXT;
+
     static const int MENU_PLAY_TAG;
     static const int MENU_SETTINGS_TAG;
     static const int MENU_EXIT_TAG;
 
     static const int MENU_BACK_TAG;
     static const int MENU_START_TAG;
+
+    static const int MENU_RETRY_TAG;
+    static const int MENU_NEXT_TAG;
 
     static const char* const TILED_BACKGROUND_LAYER;
     static const char* const TILED_OBJECT_LAYER;
