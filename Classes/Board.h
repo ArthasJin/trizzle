@@ -44,6 +44,7 @@ private:
     TMXLayer *mBackgroundLayer;
     TMXLayer *mMetaLayer;
     TMXLayer *mObjectLayer;
+    TMXLayer *mCheckLayer;
     Layer* mBoardLayer;
     string mLevel;
     Sprite *mTapSprite;
@@ -80,6 +81,7 @@ private:
     void showMenu(bool shouldNext);
     void menuCallback(Ref *sender);
     void showToast(const string &message, float duration);
+    bool canLose(Vec2 &coord);
 public:
     Board(Layer *layer);
     void loadTiledMap(const string &filename);

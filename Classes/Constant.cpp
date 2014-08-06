@@ -31,6 +31,7 @@ const int Constant::MENU_NEXT_TAG = 6;
 const char* const Constant::TILED_BACKGROUND_LAYER = "background";
 const char* const Constant::TILED_OBJECT_LAYER = "object";
 const char* const Constant::TILED_META_LAYER = "meta";
+const char* const Constant::TILED_CHECK_LAYER = "check";
 
 const int Constant::DIRECT_LEFT = 0;
 const int Constant::DIRECT_RIGHT = 1;

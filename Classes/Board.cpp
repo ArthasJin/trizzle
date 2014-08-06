@@ -90,6 +90,7 @@ void Board::initTiledMap(const string &filename) {
     mBackgroundLayer = mTiledMap->getLayer(Constant::TILED_BACKGROUND_LAYER);
     mMetaLayer = mTiledMap->getLayer(Constant::TILED_META_LAYER);
     mObjectLayer = mTiledMap->getLayer(Constant::TILED_OBJECT_LAYER);
+    mCheckLayer = mTiledMap->getLayer(Constant::TILED_CHECK_LAYER);
 
     Size metaSize = mMetaLayer->getLayerSize();
     mBoardMap = vector<vector<TrizzleSprite *> >(metaSize.height, vector<TrizzleSprite *>(metaSize.width, NULL));
@@ -218,7 +219,7 @@ void Board::startPlay() {
             return;
         } else {
             if (mGameStatus == Constant::GAME_STATUS_UNKNOWN) {
-                if (mTapSprite != NULL && mTapSprite->isRunning()) {
+                if (mTapSprite != NULL) {
                     mTapSprite->removeFromParentAndCleanup(true);
                     mTapSprite = NULL;
                 }
@@ -252,13 +253,21 @@ void Board::update(float dt) {
             showMessage("You Win!");
             showMenu(true);
         }
+        return;
     }
-    if (mPlayerQueue.empty() && !mEnemyQueue.empty()) {
-        log("CPU wins!");
-        mGameStatus = Constant::GAME_STATUS_LOSE;
-        stopPlay();
-        showMessage("You Lose!");
-        showMenu(false);
+    if (!mEnemyQueue.empty()) {
+        Vec2 vec2 = tileCoordForPosition(mEnemyQueue.back()->getPosition());
+        vec2.x -= 1;
+        vec2.y -= 1;
+
+        if (mPlayerQueue.empty() && !mEnemyQueue.empty() || canLose(vec2)) {
+            log("CPU wins!");
+            mGameStatus = Constant::GAME_STATUS_LOSE;
+            stopPlay();
+            showMessage("You Lose!");
+            showMenu(false);
+            return;
+        }
     }
 }
 
@@ -547,4 +556,16 @@ void Board::setOnMenuClickedListener(OnMenuClickedListener *listener) {
 
 void Board::showToast(const string &message, float duration) {
     Toast::showToast(this->mBoardLayer, message, duration);
+}
+
+bool Board::canLose(Vec2 &coord) {
+    if (mCheckLayer) {
+        int tileGid = mCheckLayer->getTileGIDAt(coord);
+        Value properties = mTiledMap->getPropertiesForGID(tileGid);
+        if (properties.getType() == Value::Type::MAP) {
+            log("can lose = %d", properties.asValueMap()["lose"].asBool());
+            return properties.asValueMap()["lose"].asBool();
+        }
+    }
+    return false;
 }

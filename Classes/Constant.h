@@ -34,6 +34,7 @@ public:
     static const char* const TILED_BACKGROUND_LAYER;
     static const char* const TILED_OBJECT_LAYER;
     static const char* const TILED_META_LAYER;
+    static const char* const TILED_CHECK_LAYER;
 
     static const int DIRECT_LEFT;
     static const int DIRECT_RIGHT;

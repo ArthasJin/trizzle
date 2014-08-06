@@ -80,6 +80,7 @@ void GamePlayScene::start() {
 
 void GamePlayScene::back() {
     mBoard.stopPlay();
+    gCurrentLevel = "level1.tmx";
     Scene *menuScene = MenuScene::createScene();
     auto transition = TransitionFade::create(1.0f, menuScene);
     Director::getInstance()->replaceScene(transition);
