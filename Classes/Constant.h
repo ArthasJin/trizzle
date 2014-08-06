@@ -45,6 +45,10 @@ public:
     static const char* const KNIGHT_RIGHT;
     static const char* const THIEF_LEFT;
     static const char* const THIEF_RIGHT;
+
+    static const int GAME_STATUS_UNKNOWN;
+    static const int GAME_STATUS_LOSE;
+    static const int GAME_STATUS_WIN;
 };
 
 #endif

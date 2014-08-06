@@ -42,3 +42,7 @@ const char* const Constant::KNIGHT_LEFT = "knight_walk_left";
 const char* const Constant::KNIGHT_RIGHT = "knight_walk_right";
 const char* const Constant::THIEF_LEFT = "thief_walk_left";
 const char* const Constant::THIEF_RIGHT = "thief_walk_right";
+
+const int Constant::GAME_STATUS_UNKNOWN = -1;
+const int Constant::GAME_STATUS_LOSE = 0;
+const int Constant::GAME_STATUS_WIN = 1;

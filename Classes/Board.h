@@ -4,6 +4,7 @@
 #include "cocos2d.h"
 #include "Constant.h"
 #include "TrizzleSprite.h"
+#include "Toast.h"
 
 #include <time.h>
 
@@ -54,6 +55,8 @@ private:
     queue<TrizzleSprite *> mPlayerQueue;
     queue<TrizzleSprite *> mEnemyQueue;
 
+    int mGameStatus;
+
     void initTiledMap(const string &filename);
     void initObject();
     Vec2 tileCoordForPosition(Vec2 position);
@@ -76,6 +79,7 @@ private:
     Vector<SpriteFrame *> getSpriteFrames(TrizzleSprite *sprite, int direction);
     void showMenu(bool shouldNext);
     void menuCallback(Ref *sender);
+    void showToast(const string &message, float duration);
 public:
     Board(Layer *layer);
     void loadTiledMap(const string &filename);

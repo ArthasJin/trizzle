@@ -4,7 +4,8 @@ Board::Board(Layer *layer) : mBoardLayer(layer),
                              mPlayerQueue(queue<TrizzleSprite *>()),
                              mEnemyQueue(queue<TrizzleSprite *>()),
                              mIsRunning(false),
-                             mIsPlayerTurn(true) {}
+                             mIsPlayerTurn(true),
+                             mGameStatus(Constant::GAME_STATUS_UNKNOWN) {}
 
 vector<string> makeVector() {
     vector<string> v;
@@ -70,6 +71,8 @@ void Board::initTiledMap(const string &filename) {
     mBoardMap.clear();
     mIsRunning = false;
     mIsPlayerTurn = true;
+    mGameStatus = Constant::GAME_STATUS_UNKNOWN;
+
     mPlayerQueue = queue<TrizzleSprite *>();
     mEnemyQueue = queue<TrizzleSprite *>();
 
@@ -211,12 +214,21 @@ void Board::startPlay() {
             }
         }
         if (mPlayerQueue.empty()) {
+            showToast("Please put your characters!", 2.0f);
             return;
+        } else {
+            if (mGameStatus == Constant::GAME_STATUS_UNKNOWN) {
+                if (mTapSprite != NULL && mTapSprite->isRunning()) {
+                    mTapSprite->removeFromParentAndCleanup(true);
+                    mTapSprite = NULL;
+                }
+                mIsRunning = true;
+                Director::getInstance()->getScheduler()->schedule(schedule_selector(Board::update), this, 0.5, false);
+        //        update(0);
+            }
         }
-        mTapSprite->removeFromParentAndCleanup(true);
-        mIsRunning = true;
-        Director::getInstance()->getScheduler()->schedule(schedule_selector(Board::update), this, 0.5, false);
-//        update(0);
+    } else {
+        showToast("The game is already started!", 2.0f);
     }
 }
 
@@ -232,6 +244,7 @@ void Board::update(float dt) {
     }
     if (!mPlayerQueue.empty() && mEnemyQueue.empty()) {
         log("player wins!");
+        mGameStatus = Constant::GAME_STATUS_WIN;
         stopPlay();
         if (mLevel[5] == '4') {
             showMessage("Clear!");
@@ -242,6 +255,7 @@ void Board::update(float dt) {
     }
     if (mPlayerQueue.empty() && !mEnemyQueue.empty()) {
         log("CPU wins!");
+        mGameStatus = Constant::GAME_STATUS_LOSE;
         stopPlay();
         showMessage("You Lose!");
         showMenu(false);
@@ -427,13 +441,6 @@ bool Board::isFinished() {
     if (mPlayerQueue.empty() || mEnemyQueue.empty()) {
         return true;
     }
-    int row = mBoardMap.size();
-    int col = mBoardMap[0].size();
-    for (int i = 0; i < row; ++i) {
-        for (int j = 0; j < col; ++j) {
-
-        }
-    }
     return false;
 }
 
@@ -457,6 +464,10 @@ void Board::showMenu(bool shouldNext) {
         retry->setTag(Constant::MENU_RETRY_TAG);
 
         menu = Menu::create(retry, NULL);
+
+        menu->setAnchorPoint(Vec2(0.5, 0.5));
+        menu->alignItemsHorizontallyWithPadding(20.0);
+        menu->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y - 100));
     } else {
         MenuItemFont *menuTitle = MenuItemFont::create(Constant::MENU_PLAY, CC_CALLBACK_1(Board::menuCallback, this));
         menuTitle->setFontName(Constant::FONT);
@@ -474,10 +485,12 @@ void Board::showMenu(bool shouldNext) {
         next->setFontName(Constant::FONT);
 
         menu = Menu::create(menuTitle, retry, next, NULL);
+
+        menu->setAnchorPoint(Vec2(0.5, 0.5));
+        menu->alignItemsHorizontallyWithPadding(20.0);
+        menu->setPosition(Vec2(visibleSize.width / 2 + origin.x - 80, visibleSize.height / 2 + origin.y - 100));
     }
-    menu->setAnchorPoint(Vec2(0.5, 0.5));
-    menu->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y - 100));
-    menu->alignItemsVerticallyWithPadding(20.0);
+
     mBoardLayer->addChild(menu, 999);
 }
 
@@ -530,4 +543,8 @@ Vector<SpriteFrame *> Board::getSpriteFrames(TrizzleSprite *sprite, int directio
 
 void Board::setOnMenuClickedListener(OnMenuClickedListener *listener) {
     mMenuClickedListener = listener;
+}
+
+void Board::showToast(const string &message, float duration) {
+    Toast::showToast(this->mBoardLayer, message, duration);
 }

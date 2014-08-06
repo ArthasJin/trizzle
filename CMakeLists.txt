@@ -48,6 +48,7 @@ set(GAME_SRC
   Classes/SplashScene.cpp
   Classes/Board.cpp
   Classes/TrizzleSprite.cpp
+  Classes/Toast.cpp
 )
 
 set(COCOS2D_ROOT ${CMAKE_SOURCE_DIR}/cocos2d)
