@@ -45,6 +45,7 @@ private:
     TMXLayer *mObjectLayer;
     Layer* mBoardLayer;
     string mLevel;
+    Sprite *mTapSprite;
 
     bool mIsRunning;
     bool mIsPlayerTurn;

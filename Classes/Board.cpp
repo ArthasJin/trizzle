@@ -73,6 +73,11 @@ void Board::initTiledMap(const string &filename) {
     mPlayerQueue = queue<TrizzleSprite *>();
     mEnemyQueue = queue<TrizzleSprite *>();
 
+    Sprite *instruction = Sprite::create("instruction.png");
+    instruction->setScale(0.3);
+    instruction->setPosition(480, 580);
+    mBoardLayer->addChild(instruction, 999);
+
     mLevel = filename;
     mTiledMap = TMXTiledMap::create(filename);
     mTiledMap->setAnchorPoint(Vec2(0.5, 0.5));
@@ -108,6 +113,25 @@ void Board::initObject() {
         s->setPosition(offsetPos);
 
         this->mBoardLayer->addChild(s, 999);
+    }
+    TMXObjectGroup *tap = mTiledMap->getObjectGroup("tap");
+    if (tap) {
+        ValueVector objects = tap->getObjects();
+        for (ValueVector::iterator iter = objects.begin(); iter != objects.end(); ++iter) {
+            Value v = *iter;
+            ValueMap tapPoint = v.asValueMap();
+            int x = tapPoint["x"].asInt();
+            int y = tapPoint["y"].asInt();
+            log("x = %d, y = %d", x, y);
+            mTapSprite = Sprite::create("tap.png");
+            Vec2 pos = offsetForPosition(Vec2(x, y));
+            log("pos.x = %d, pos.y = %d", pos.x, pos.y);
+            Vec2 coord = tileCoordForPosition(pos);
+            log("coord.x = %d, coord.y = %d", coord.x, coord.y);
+            mTapSprite->setAnchorPoint(Vec2::ZERO);
+            mTapSprite->setPosition(Vec2(x - 32, y));
+            this->mBoardLayer->addChild(mTapSprite);
+        }
     }
 }
 
@@ -186,6 +210,10 @@ void Board::startPlay() {
                 }
             }
         }
+        if (mPlayerQueue.empty()) {
+            return;
+        }
+        mTapSprite->removeFromParentAndCleanup(true);
         mIsRunning = true;
         Director::getInstance()->getScheduler()->schedule(schedule_selector(Board::update), this, 0.5, false);
 //        update(0);
@@ -205,8 +233,8 @@ void Board::update(float dt) {
     if (!mPlayerQueue.empty() && mEnemyQueue.empty()) {
         log("player wins!");
         stopPlay();
-        if (mLevel[5] == '5') {
-            showMessage("Finished!");
+        if (mLevel[5] == '4') {
+            showMessage("Clear!");
         } else {
             showMessage("You Win!");
             showMenu(true);
@@ -377,6 +405,19 @@ void Board::attack(TrizzleSprite *attacker, TrizzleSprite *defender) {
         explode(defender);
         defender->setAlive(false);
         Vec2 coord = tileCoordForPosition(defender->getPosition());
+        coord.y -= 1;
+        setSprite(coord, NULL);
+    } else if (attacker->getType() == defender->getType()) {
+        explode(defender);
+        explode(attacker);
+        defender->setAlive(false);
+        attacker->setAlive(false);
+
+        Vec2 coord = tileCoordForPosition(defender->getPosition());
+        coord.y -= 1;
+        setSprite(coord, NULL);
+
+        coord = tileCoordForPosition(attacker->getPosition());
         coord.y -= 1;
         setSprite(coord, NULL);
     }

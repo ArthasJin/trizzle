@@ -332,4 +332,7 @@
    <tile gid="0"/>
   </data>
  </layer>
+ <objectgroup name="tap" width="15" height="10">
+  <object name="Tap" type="Instruction" x="328" y="331" width="48" height="43"/>
+ </objectgroup>
 </map>

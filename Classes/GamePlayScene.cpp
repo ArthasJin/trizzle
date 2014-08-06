@@ -39,9 +39,7 @@ void GamePlayScene::initBackground() {
 
 void GamePlayScene::initGameBoard() {
     mBoard.loadTiledMap(gCurrentLevel);
-    // mTiledMap = mBoard.getTiledMap();
     mBoard.setOnMenuClickedListener(this);
-    // addChild(mTiledMap);
 }
 
 void GamePlayScene::initNavigator() {
@@ -117,7 +115,7 @@ void GamePlayScene::onMenuClicked(int menu) {
 }
 
 string GamePlayScene::getNextLevel(string level) {
-    if (level[5] < '5') {
+    if (level[5] < '4') {
         level[5] += 1;
     }
     return level;
