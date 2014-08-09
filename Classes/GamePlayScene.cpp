@@ -43,14 +43,19 @@ void GamePlayScene::initGameBoard() {
 }
 
 void GamePlayScene::initNavigator() {
+    MenuItemFont *menuTitle = MenuItemFont::create(Constant::MENU_PLAY, CC_CALLBACK_1(GamePlayScene::navigatorCallback, this));
+    menuTitle->setFontName(Constant::FONT);
+    menuTitle->setFontSize(64);
+    menuTitle->setVisible(false);
+
     MenuItemFont *back = MenuItemFont::create(Constant::MENU_BACK, CC_CALLBACK_1(GamePlayScene::navigatorCallback, this));
     back->setFontName(Constant::FONT);
-    back->setFontSize(100);
+    back->setFontSize(64);
     back->setTag(Constant::MENU_BACK_TAG);
 
     MenuItemFont *start = MenuItemFont::create(Constant::MENU_START, CC_CALLBACK_1(GamePlayScene::navigatorCallback, this));
     start->setFontName(Constant::FONT);
-    start->setFontSize(100);
+    start->setFontSize(64);
     start->setTag(Constant::MENU_START_TAG);
 
     Menu *menu = Menu::create(back, start, NULL);
