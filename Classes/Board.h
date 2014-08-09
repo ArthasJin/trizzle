@@ -48,6 +48,8 @@ private:
     Layer* mBoardLayer;
     string mLevel;
     Sprite *mTapSprite;
+    Sprite *mInstruction;
+    Sprite *mUpArrow;
 
     bool mIsRunning;
     bool mIsPlayerTurn;

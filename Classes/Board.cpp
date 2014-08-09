@@ -76,10 +76,15 @@ void Board::initTiledMap(const string &filename) {
     mPlayerQueue = queue<TrizzleSprite *>();
     mEnemyQueue = queue<TrizzleSprite *>();
 
-    Sprite *instruction = Sprite::create("instruction.png");
-    instruction->setScale(0.3);
-    instruction->setPosition(480, 580);
-    mBoardLayer->addChild(instruction, 999);
+    mInstruction = Sprite::create("instruction.png");
+    mUpArrow = Sprite::create("up.png");
+    mUpArrow->setScale(0.25);
+    mUpArrow->setPosition(480, 580);
+    mUpArrow->setVisible(false);
+    mInstruction->setScale(0.3);
+    mInstruction->setPosition(480, 580);
+    mBoardLayer->addChild(mInstruction, 999);
+    mBoardLayer->addChild(mUpArrow, 999);
 
     mLevel = filename;
     mTiledMap = TMXTiledMap::create(filename);
@@ -170,14 +175,21 @@ void Board::setSprite(Vec2 &coord, TrizzleSprite *sprite) {
 
 TrizzleSprite *Board::getNext(TrizzleSprite *sprite) {
     TrizzleSprite *newSprite = NULL;
+    int type = 0;
     if (sprite == NULL) {
         newSprite = TrizzleSprite::create(sFiles[0], 0, false);
+        type = 1;
     } else {
         int nextType = (sprite->getType() + 1) % sFiles.size();
         string filename = sFiles[nextType];
         mBoardLayer->removeChild(sprite);
         newSprite = TrizzleSprite::create(filename, nextType, false);
+        type = (nextType + 1) % sFiles.size();
     }
+    mUpArrow->setVisible(true);
+    mUpArrow->setPosition((type) * 80 + 360, 500);
+    Action *action = Blink::create(1, 2);
+    mUpArrow->runAction(action);
     return newSprite;
 }
 
@@ -223,6 +235,9 @@ void Board::startPlay() {
                     mTapSprite->removeFromParentAndCleanup(true);
                     mTapSprite = NULL;
                 }
+                if (mUpArrow != NULL) {
+                    mUpArrow->setVisible(false);
+                }
                 mIsRunning = true;
                 Director::getInstance()->getScheduler()->schedule(schedule_selector(Board::update), this, 0.5, false);
         //        update(0);
@@ -247,7 +262,7 @@ void Board::update(float dt) {
         log("player wins!");
         mGameStatus = Constant::GAME_STATUS_WIN;
         stopPlay();
-        if (mLevel[5] == '4') {
+        if (mLevel[5] == '6') {
             showMessage("Clear!");
         } else {
             showMessage("You Win!");
@@ -467,9 +482,14 @@ void Board::showMenu(bool shouldNext) {
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
     Menu *menu = NULL;
     if (!shouldNext) {
+        MenuItemFont *menuTitle = MenuItemFont::create(Constant::MENU_PLAY, CC_CALLBACK_1(Board::menuCallback, this));
+        menuTitle->setFontName(Constant::FONT);
+        menuTitle->setFontSize(64);
+        menuTitle->setVisible(false);
+
         MenuItemFont *retry = MenuItemFont::create(Constant::MENU_RETRY, CC_CALLBACK_1(Board::menuCallback, this));
         retry->setFontName(Constant::FONT);
-        retry->setFontSize(80);
+        retry->setFontSize(64);
         retry->setTag(Constant::MENU_RETRY_TAG);
 
         menu = Menu::create(retry, NULL);
@@ -480,17 +500,17 @@ void Board::showMenu(bool shouldNext) {
     } else {
         MenuItemFont *menuTitle = MenuItemFont::create(Constant::MENU_PLAY, CC_CALLBACK_1(Board::menuCallback, this));
         menuTitle->setFontName(Constant::FONT);
-        menuTitle->setFontSize(80);
+        menuTitle->setFontSize(64);
         menuTitle->setVisible(false);
 
         MenuItemFont *retry = MenuItemFont::create(Constant::MENU_RETRY, CC_CALLBACK_1(Board::menuCallback, this));
         retry->setFontName(Constant::FONT);
-        retry->setFontSize(80);
+        retry->setFontSize(64);
         retry->setTag(Constant::MENU_RETRY_TAG);
 
         MenuItemFont *next = MenuItemFont::create(Constant::MENU_NEXT, CC_CALLBACK_1(Board::menuCallback, this));
         next->setTag(Constant::MENU_NEXT_TAG);
-        next->setFontSize(80);
+        next->setFontSize(64);
         next->setFontName(Constant::FONT);
 
         menu = Menu::create(menuTitle, retry, next, NULL);

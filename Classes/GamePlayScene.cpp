@@ -116,7 +116,7 @@ void GamePlayScene::onMenuClicked(int menu) {
 }
 
 string GamePlayScene::getNextLevel(string level) {
-    if (level[5] < '4') {
+    if (level[5] < '6') {
         level[5] += 1;
     }
     return level;
