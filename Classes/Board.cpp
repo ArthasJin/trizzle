@@ -149,7 +149,7 @@ TMXTiledMap* Board::getTiledMap() {
 }
 
 void Board::onTouch(Touch *touch) {
-    if (!mIsRunning) {
+    if (!mIsRunning && mGameStatus == Constant::GAME_STATUS_UNKNOWN) {
         Vec2 point = touch->getLocationInView();
         point = Director::getInstance()->convertToGL(point);
         point = mBoardLayer->convertToNodeSpace(point);
@@ -517,7 +517,7 @@ void Board::showMenu(bool shouldNext) {
 
         menu->setAnchorPoint(Vec2(0.5, 0.5));
         menu->alignItemsHorizontallyWithPadding(20.0);
-        menu->setPosition(Vec2(visibleSize.width / 2 + origin.x - 80, visibleSize.height / 2 + origin.y - 100));
+        menu->setPosition(Vec2(visibleSize.width / 2 + origin.x - 54, visibleSize.height / 2 + origin.y - 100));
     }
 
     mBoardLayer->addChild(menu, 999);
